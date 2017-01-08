@@ -30,6 +30,7 @@
   </dependencies>
 
   <build>
+    <finalName>JavaFXApp</finalName>
     <plugins>
 
       <!-- Set a JDK compiler level -->
