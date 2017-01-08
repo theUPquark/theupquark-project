@@ -1,23 +1,29 @@
 package com.theupquark.app;
 
+import com.theupquark.games.blockade.Blockade;
+
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-
+/**
+ * Starts JavaFX window formatted with a BorderPane 
+ */
 public class JavaFXWindow extends Application {
+
+  private boolean betweenGames = true;
 
   public void start(Stage primaryStage) {
     
-    Button btOK = new Button("OK");
-    Scene scene = new Scene(this.getPane(), 600, 200);
-    primaryStage.setTitle("JavaFXWindow");
+    Scene scene = new Scene(this.getPane(), 900, 600);
+    primaryStage.setTitle("JavaFX Window");
     primaryStage.setScene(scene);
     primaryStage.show();
 
@@ -47,10 +53,9 @@ public class JavaFXWindow extends Application {
     bPane.setTop(topPane);
 
     //CENTER
-    Pane screen = new Pane();
-    screen.setStyle("-fx-background-color: black");
-    screen.setPrefSize(400, 100);
-    bPane.setCenter(screen);
+    bPane.setCenter(new Blockade());
+
     return bPane;
   }
+
 } 
