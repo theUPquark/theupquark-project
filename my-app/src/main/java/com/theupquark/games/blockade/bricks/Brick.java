@@ -6,8 +6,8 @@ import javafx.scene.paint.Paint;
 
 public class Brick extends Rectangle {
 
-  private static final double REC_WIDTH = 45;
-  private static final double REC_HEIGHT = 15;
+  private static final double REC_WIDTH = 80;
+  private static final double REC_HEIGHT = 25;
 
   public Brick(double x, double y, Paint fill) {
     this.setWidth(REC_WIDTH);

@@ -39,8 +39,8 @@ public class Blockade extends Pane {
 
   public Blockade() {
     this.setStyle("-fx-background-color: black");
-    this.setPrefSize(400, 100);
-    this.setGrid(7, 5);
+    this.setPrefWidth(900);
+    this.setGrid(10, 7);
 
     lives = 3;
     activePaddle = new Paddle(200, 500);
@@ -145,8 +145,10 @@ public class Blockade extends Pane {
    * @param gridDepth how many brick layers
    */
   private void setGrid(int gridLength, int gridDepth) {
-    int startX = 10;
-    int startY = 30;
+    //startX should change to center grid
+    System.out.println("blockade width: " + this.getWidth());
+    double startX = (this.getPrefWidth() - gridLength * Brick.getBrickWidth()) / 2;
+    double startY = 30;
     for (int i = 0; i < gridLength; i++) {
       for (int j = 0; j < gridDepth; j++) {
         this.getChildren().add(new Brick(startX + i * Brick.getBrickWidth(),
