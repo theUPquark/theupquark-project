@@ -34,12 +34,15 @@ public class Blockade extends Pane {
   private Ball activeBall;
   private Paddle activePaddle;
   private List<Brick> activeBricks;
+  private int lives;
+  private Timeline gameplay;
 
   public Blockade() {
     this.setStyle("-fx-background-color: black");
     this.setPrefSize(400, 100);
     this.setGrid(7, 5);
 
+    lives = 3;
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
 
@@ -48,8 +51,8 @@ public class Blockade extends Pane {
     activeBall.setVelocityX(5);
     this.getChildren().add(activeBall);
 
-    Timeline gameplay = new Timeline(new KeyFrame(
-          Duration.millis(30), e-> this.startBall()));
+    gameplay = new Timeline(new KeyFrame(
+        Duration.millis(30), e-> this.startBall()));
     gameplay.setCycleCount(Timeline.INDEFINITE);
 
     this.setOnMouseMoved(event -> {
@@ -111,6 +114,7 @@ public class Blockade extends Pane {
       activeBall.setVelocityY(-activeBall.getVelocityY());
     } else if (activeBall.getCenterY() > this.getHeight() - activeBall.getRadius()) {
       activeBall.setVelocityY(-activeBall.getVelocityY());
+      this.failConditionResult();
     }
 
     activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
@@ -122,6 +126,17 @@ public class Blockade extends Pane {
     }
   }
 
+  /**
+   * Lose 'life' when ball hits the lower edge of the pane, 
+   * and respawn ball with game 'paused'
+   */
+  public void failConditionResult() {
+    betweenGames = true;
+    gameplay.pause();
+
+    activeBall.setCenterX(200);
+    activeBall.setCenterY(activePaddle.getY() - 11);
+  }
   /**
    * Set the grid of bricks.
    *
