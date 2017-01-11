@@ -49,11 +49,11 @@ public class Blockade extends Pane {
     this.getChildren().add(activeBall);
 
     Timeline gameplay = new Timeline(new KeyFrame(
-          Duration.millis(100), e-> this.startBall()));
+          Duration.millis(30), e-> this.startBall()));
     gameplay.setCycleCount(Timeline.INDEFINITE);
 
     this.setOnMouseMoved(event -> {
-      activePaddle.setX(event.getX());
+      activePaddle.setX(event.getX() - activePaddle.getWidth() / 2);
 
       if (betweenGames) {
         activeBall.setCenterX(activePaddle.getX() + activePaddle.getWidth() / 2);
@@ -74,7 +74,7 @@ public class Blockade extends Pane {
    * 
    */
   public void startBall() {
-    activeBall.setCenterY(activeBall.getCenterY() - activeBall.getVelocityY());
+    activeBall.setCenterY(activeBall.getCenterY() + activeBall.getVelocityY());
 
     //Actions on intersect with activeBall
     List<Node> nodesToRemove = new ArrayList<>();
@@ -94,15 +94,11 @@ public class Blockade extends Pane {
               activeBall.setVelocityY(-activeBall.getVelocityY());
             }
           } else if (node instanceof Paddle) {
-            //TODO Paddle should adjust velocity based on position of interaction
-            if (intersect.getWidth() > intersect.getHeight()) {
-              activeBall.setVelocityY(-activeBall.getVelocityY());
-            } else if (intersect.getWidth() < intersect.getHeight()) {
-              activeBall.setVelocityX(-activeBall.getVelocityX());
-            } else {
-              activeBall.setVelocityX(-activeBall.getVelocityX());
-              activeBall.setVelocityY(-activeBall.getVelocityY());
-            }
+            //Paddle adjusts velocity based on position of interaction
+            double position = activeBall.getCenterX() - ((Paddle) node).getX() - ((Paddle) node).getWidth() / 2;
+            System.out.println("Relative ball position on paddle: " + position);
+            activeBall.setVelocityX(Math.floor(position / 5));
+            activeBall.setVelocityY(-activeBall.getVelocityY());
           }
         }
 
@@ -117,7 +113,7 @@ public class Blockade extends Pane {
       activeBall.setVelocityY(-activeBall.getVelocityY());
     }
 
-    activeBall.setCenterX(activeBall.getCenterX() - activeBall.getVelocityX());
+    activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
 
     if (activeBall.getCenterX() < activeBall.getRadius()) {
       activeBall.setVelocityX(-activeBall.getVelocityX());

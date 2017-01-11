@@ -5,8 +5,8 @@ import javafx.scene.paint.Color;
 
 public class Ball extends Circle {
 
-  private int velocityX;
-  private int velocityY;
+  private double velocityX;
+  private double velocityY;
 
   public Ball(double centerX, double centerY) {
     super(centerX, centerY, 10, Color.WHITE);
@@ -14,19 +14,19 @@ public class Ball extends Circle {
     velocityY = 0;
   }
 
-  public void setVelocityX(int velocityX) {
+  public void setVelocityX(double velocityX) {
     this.velocityX = velocityX;
   }
 
-  public int getVelocityX() {
+  public double getVelocityX() {
     return this.velocityX;
   }
 
-  public void setVelocityY(int velocityY) {
+  public void setVelocityY(double velocityY) {
     this.velocityY = velocityY;
   }
 
-  public int getVelocityY() {
+  public double getVelocityY() {
     return this.velocityY;
   }
 }
