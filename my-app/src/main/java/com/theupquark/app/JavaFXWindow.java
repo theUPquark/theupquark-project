@@ -25,6 +25,7 @@ public class JavaFXWindow extends Application {
     Scene scene = new Scene(this.getPane(), 900, 600);
     primaryStage.setTitle("JavaFX Window");
     primaryStage.setScene(scene);
+    primaryStage.setResizable(false);
     primaryStage.show();
 
 
