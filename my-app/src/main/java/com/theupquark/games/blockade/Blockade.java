@@ -17,6 +17,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -36,12 +39,18 @@ public class Blockade extends Pane {
   private List<Brick> activeBricks;
   private int lives;
   private Timeline gameplay;
+  private MediaPlayer soundCollision;
 
   public Blockade() {
     this.setStyle("-fx-background-color: black");
     this.setPrefWidth(900);
     this.setGrid(10, 7);
 
+    ClassLoader classLoader = getClass().getClassLoader();
+    //getResourceAsStream(--)?? 
+    //soundCollision = new AudioClip("http://cs.au.dk/~dsound/DigitalAudio.dir/Greenfoot/Pong.dir/sounds_ping_pong_8bit/ping_pong_8bit_plop.wav");
+    soundCollision = new MediaPlayer(new Media("http://cs.au.dk/~dsound/DigitalAudio.dir/Greenfoot/Pong.dir/sounds_ping_pong_8bit/ping_pong_8bit_plop.wav"));
+    soundCollision.setCycleCount(1);
     lives = 3;
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
@@ -85,6 +94,8 @@ public class Blockade extends Pane {
       if (node instanceof Shape && !(node instanceof Ball)) {
         Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
         if (intersect.getWidth() != -1) {
+          soundCollision.play();
+          System.out.println("# sounds; " + soundCollision.getCurrentCount());
           System.out.println(node.getClass() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
           if (node instanceof Brick) {
             nodesToRemove.add(node);
