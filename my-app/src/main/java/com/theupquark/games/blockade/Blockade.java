@@ -91,7 +91,7 @@ public class Blockade extends Pane {
     activeBall.setCenterY(activeBall.getCenterY() + activeBall.getVelocityY());
 
     //Actions on intersect with activeBall
-    List<Node> nodesToRemove = new ArrayList<>();
+    List<Node> nodesHit = new ArrayList<>();
     for (Node node : this.getChildren()) {
       if (node instanceof Shape && !(node instanceof Ball)) {
         Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
@@ -100,8 +100,11 @@ public class Blockade extends Pane {
           System.out.println("# sounds; " + soundCollision.getCurrentCount());
           System.out.println(node.getClass() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
           if (node instanceof Brick) {
-            score++;
-            nodesToRemove.add(node);
+            if (((Brick) node).removeBrick()) {
+              //Results of specific brick types being broken can be defined here.
+              nodesHit.add(node);
+              score++;
+            }
             //TODO see what happens if we only allow this to happen once per loop.
             if (intersect.getWidth() > intersect.getHeight()) {
               activeBall.setVelocityY(-activeBall.getVelocityY());
@@ -122,7 +125,7 @@ public class Blockade extends Pane {
 
       }
     }
-    this.getChildren().removeAll(nodesToRemove);
+    this.getChildren().removeAll(nodesHit);
 
     //reverse velocity on pane borders
     if (activeBall.getCenterY() < activeBall.getRadius()) {

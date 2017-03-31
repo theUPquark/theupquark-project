@@ -27,4 +27,13 @@ public class Brick extends Rectangle {
   public static double getBrickHeight() {
     return REC_HEIGHT;
   }
+
+  /**
+   * Return true when the brick should be removed from play.
+   *
+   * @return true always by default
+   */
+  public boolean removeBrick() {
+    return true;
+  }
 }
