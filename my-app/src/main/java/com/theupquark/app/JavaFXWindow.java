@@ -44,17 +44,19 @@ public class JavaFXWindow extends Application {
    * @returns borderPane
    */
   private BorderPane getPane() {
+    Blockade blockade = new Blockade();
+
     BorderPane bPane = new BorderPane();
 
     //TOP
-    Text title = new Text(100, 50, "Window Text");
+    Text title = new Text(100, 50, blockade.getTitle());
     GridPane topPane = new GridPane();
     topPane.add(title, 0, 0);
     topPane.setAlignment(Pos.CENTER);
     bPane.setTop(topPane);
 
     //CENTER
-    bPane.setCenter(new Blockade());
+    bPane.setCenter(blockade);
 
     return bPane;
   }

@@ -38,6 +38,7 @@ public class Blockade extends Pane {
   private Paddle activePaddle;
   private List<Brick> activeBricks;
   private int lives;
+  private int score;
   private Timeline gameplay;
   private MediaPlayer soundCollision;
 
@@ -52,6 +53,7 @@ public class Blockade extends Pane {
     soundCollision = new MediaPlayer(new Media("http://cs.au.dk/~dsound/DigitalAudio.dir/Greenfoot/Pong.dir/sounds_ping_pong_8bit/ping_pong_8bit_plop.wav"));
     soundCollision.setCycleCount(1);
     lives = 3;
+    score = 0;
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
 
@@ -98,7 +100,9 @@ public class Blockade extends Pane {
           System.out.println("# sounds; " + soundCollision.getCurrentCount());
           System.out.println(node.getClass() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
           if (node instanceof Brick) {
+            score++;
             nodesToRemove.add(node);
+            //TODO see what happens if we only allow this to happen once per loop.
             if (intersect.getWidth() > intersect.getHeight()) {
               activeBall.setVelocityY(-activeBall.getVelocityY());
             } else if (intersect.getWidth() < intersect.getHeight()) {
@@ -144,6 +148,7 @@ public class Blockade extends Pane {
   public void failConditionResult() {
     betweenGames = true;
     gameplay.pause();
+    lives--;
 
     activeBall.setCenterX(200);
     activeBall.setCenterY(activePaddle.getY() - 11);
@@ -169,4 +174,24 @@ public class Blockade extends Pane {
     }
   }
 
+  /**
+   * Test method for getting some information
+   */
+  public String getTitle() {
+    return "Blockade";
+  }
+
+  /**
+   * Get number of bricks destoryed
+   */
+  public int getScore() {
+    return this.score;
+  }
+
+  /**
+   * Get lives
+   */
+  public int getLives() {
+    return this.lives;
+  }
 }
