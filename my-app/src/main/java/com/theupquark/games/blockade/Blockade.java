@@ -3,6 +3,7 @@ package com.theupquark.games.blockade;
 import com.theupquark.games.blockade.balls.Ball;
 import com.theupquark.games.blockade.bricks.Brick;
 import com.theupquark.games.blockade.paddles.Paddle;
+import com.theupquark.ui.Popup;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class Blockade extends Pane {
   private Ball activeBall;
   private Paddle activePaddle;
   private List<Brick> activeBricks;
+  private Popup msgLiveLost;
   private int lives;
   private int score;
   private Timeline gameplay;
@@ -46,6 +48,8 @@ public class Blockade extends Pane {
     this.setStyle("-fx-background-color: black");
     this.setPrefWidth(900);
     this.setGrid(10, 7);
+
+    msgLiveLost = new Popup("You aren't so good at this.", "Try better", 400, 400);
 
     ClassLoader classLoader = getClass().getClassLoader();
     //getResourceAsStream(--)?? 
@@ -88,6 +92,7 @@ public class Blockade extends Pane {
    * 
    */
   public void startBall() {
+    this.getChildren().remove(msgLiveLost);
     activeBall.setCenterY(activeBall.getCenterY() + activeBall.getVelocityY());
 
     //Actions on intersect with activeBall
@@ -152,6 +157,13 @@ public class Blockade extends Pane {
     betweenGames = true;
     gameplay.pause();
     lives--;
+  
+    //Tell the player they are bad
+    this.getChildren().add(msgLiveLost);
+
+    if (lives < 0) {
+      //GAME OVER
+    }
 
     activeBall.setCenterX(200);
     activeBall.setCenterY(activePaddle.getY() - 11);
