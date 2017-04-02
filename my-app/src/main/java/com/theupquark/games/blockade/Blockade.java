@@ -38,9 +38,13 @@ public class Blockade extends Pane {
   private Ball activeBall;
   private Paddle activePaddle;
   private List<Brick> activeBricks;
-  private Popup msgLiveLost;
+
+  private Popup playerFeedback;
+  private Text showLives;
+  private Text showScore;
   private int lives;
   private int score;
+  
   private Timeline gameplay;
   private MediaPlayer soundCollision;
 
@@ -50,19 +54,25 @@ public class Blockade extends Pane {
     this.setStyle("-fx-background-color: black");
     this.setPrefWidth(boardWidth);
     this.setGrid(10, 7);
+    this.lives = 3;
+    this.score = 0;
 
-    msgLiveLost = new Popup("You aren't so good at this.", 
+    this.playerFeedback = new Popup("You aren't so good at this.", 
                             "Try better", 
                             100, 300, 
                             boardWidth/2 - 150, 400);
+    this.showLives = new Text(10, 550, "Lives: " + this.getLives());
+    this.showLives.setFill(Color.WHITE);
+    this.showScore = new Text(750, 550, "Score: " + this.getScore());
+    this.showScore.setFill(Color.WHITE);
+    this.getChildren().add(showLives);
+    this.getChildren().add(showScore);
 
     ClassLoader classLoader = getClass().getClassLoader();
     //getResourceAsStream(--)?? 
     //soundCollision = new AudioClip("http://cs.au.dk/~dsound/DigitalAudio.dir/Greenfoot/Pong.dir/sounds_ping_pong_8bit/ping_pong_8bit_plop.wav");
     soundCollision = new MediaPlayer(new Media("http://cs.au.dk/~dsound/DigitalAudio.dir/Greenfoot/Pong.dir/sounds_ping_pong_8bit/ping_pong_8bit_plop.wav"));
     soundCollision.setCycleCount(1);
-    lives = 3;
-    score = 0;
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
 
@@ -104,7 +114,7 @@ public class Blockade extends Pane {
    * 
    */
   public void startBall() {
-    this.getChildren().remove(msgLiveLost);
+    this.getChildren().remove(playerFeedback);
     activeBall.setCenterY(activeBall.getCenterY() + activeBall.getVelocityY());
     activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
 
@@ -166,6 +176,10 @@ public class Blockade extends Pane {
     } else if (activeBall.getCenterX() > this.getWidth() - activeBall.getRadius()) {
       activeBall.setVelocityX(-activeBall.getVelocityX());
     }
+    
+    //update ui elements
+    this.showScore.setText("Score: " + this.getScore());
+    this.showLives.setText("Lives: " + this.getLives());
   }
 
   /**
@@ -178,10 +192,14 @@ public class Blockade extends Pane {
     lives--;
   
     //Tell the player they are bad
-    this.getChildren().add(msgLiveLost);
+    this.playerFeedback.setSubTitle(this.getLives() + " remaining.");
+    this.getChildren().add(this.playerFeedback);
 
     if (lives < 0) {
       //GAME OVER
+      this.playerFeedback.setTitle("Wow, you lost..");
+
+      //TODO Reset bricks, lives, and score
     }
 
     activeBall.setCenterX(200);

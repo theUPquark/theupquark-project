@@ -42,10 +42,12 @@ public class Popup extends Pane {
     border.setY(y);
 
     this.title = new Text(x + title.length() * 2.2, y + height/2, title);
+    this.subTitle = new Text();
     this.getChildren().add(border);
     this.getChildren().add(this.title);
   }
 
+  //Might be better to pass the Text object here
   public String getTitle() {
     return this.title.getText();
   }
