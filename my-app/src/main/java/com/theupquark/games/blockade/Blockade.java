@@ -142,7 +142,8 @@ public class Blockade extends Pane {
             //Paddle adjusts velocity based on position of interaction
             double position = activeBall.getCenterX() - ((Paddle) node).getX() - ((Paddle) node).getWidth() / 2;
             System.out.println("Relative ball position on paddle: " + position);
-            activeBall.setVelocityX(Math.floor(position / 5));
+            //TODO testing with adding velocity
+            activeBall.addVelocityX(Math.floor(position / 5));
             activeBall.setVelocityY(-activeBall.getVelocityY());
           }
         }
