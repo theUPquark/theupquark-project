@@ -94,11 +94,19 @@ public class Blockade extends Pane {
 
   /**
    * Start the activeBall bouncing.
+   *
+   * Moves the activeBall location based on current velocity.
+   * 
+   * If any Brick collides with the area of the activeBall, reflect the 
+   * velocity.
+   *
+   * Any Bricks that return true for removeBrick will be removed from rendering.
    * 
    */
   public void startBall() {
     this.getChildren().remove(msgLiveLost);
     activeBall.setCenterY(activeBall.getCenterY() + activeBall.getVelocityY());
+    activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
 
     //Actions on intersect with activeBall
     List<Node> nodesHit = new ArrayList<>();
@@ -117,7 +125,8 @@ public class Blockade extends Pane {
               nodesHit.add(node);
               score++;
             }
-            //TODO see what happens if we only allow this to happen once per loop.
+            //Adjust velocity for only the first collision.
+            //TODO might need check for separate X/Y adjustments
             if (firstCollision) {
               firstCollision = false;
               if (intersect.getWidth() > intersect.getHeight()) {
@@ -150,7 +159,6 @@ public class Blockade extends Pane {
       this.failConditionResult();
     }
 
-    activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
 
     if (activeBall.getCenterX() < activeBall.getRadius()) {
       activeBall.setVelocityX(-activeBall.getVelocityX());

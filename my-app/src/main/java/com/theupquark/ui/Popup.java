@@ -19,6 +19,8 @@ public class Popup extends Pane {
   private double width;
 
   /**
+   * A rectangle with hopefully centered text.
+   *
    * @param title main title
    * @param subTitle displayed text under title
    * @param height of rectangle
