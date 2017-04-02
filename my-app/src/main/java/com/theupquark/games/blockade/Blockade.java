@@ -102,6 +102,8 @@ public class Blockade extends Pane {
 
     //Actions on intersect with activeBall
     List<Node> nodesHit = new ArrayList<>();
+    boolean firstCollision = true;
+
     for (Node node : this.getChildren()) {
       if (node instanceof Shape && !(node instanceof Ball)) {
         Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
@@ -116,13 +118,16 @@ public class Blockade extends Pane {
               score++;
             }
             //TODO see what happens if we only allow this to happen once per loop.
-            if (intersect.getWidth() > intersect.getHeight()) {
-              activeBall.setVelocityY(-activeBall.getVelocityY());
-            } else if (intersect.getWidth() < intersect.getHeight()) {
-              activeBall.setVelocityX(-activeBall.getVelocityX());
-            } else {
-              activeBall.setVelocityX(-activeBall.getVelocityX());
-              activeBall.setVelocityY(-activeBall.getVelocityY());
+            if (firstCollision) {
+              firstCollision = false;
+              if (intersect.getWidth() > intersect.getHeight()) {
+                activeBall.setVelocityY(-activeBall.getVelocityY());
+              } else if (intersect.getWidth() < intersect.getHeight()) {
+                activeBall.setVelocityX(-activeBall.getVelocityX());
+              } else {
+                activeBall.setVelocityX(-activeBall.getVelocityX());
+                activeBall.setVelocityY(-activeBall.getVelocityY());
+              }
             }
           } else if (node instanceof Paddle) {
             //Paddle adjusts velocity based on position of interaction
