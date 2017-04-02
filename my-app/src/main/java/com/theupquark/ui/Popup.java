@@ -12,37 +12,51 @@ import javafx.scene.text.Text;
  */
 public class Popup extends Pane {
 
-  private String subTitle;
+  private Text subTitle;
   private Text title;
-  private int coordX;
-  private int coordY;
 
-  public Popup(String title, String subTitle, int x, int y) {
-    this.subTitle = subTitle;
+  private double height;
+  private double width;
 
-    Rectangle border = new Rectangle(300, 100, Color.WHITE);
+  /**
+   * @param title main title
+   * @param subTitle displayed text under title
+   * @param height of rectangle
+   * @param width of rectangle
+   * @param x position within pane
+   * @param y position within pane
+   */
+  public Popup(String title, 
+               String subTitle,
+               double height,
+               double width,
+               double x, 
+               double y) {
+
+    Rectangle border = new Rectangle(width, height, Color.WHITE);
     border.setFill(Color.WHITE);
     border.setStroke(Color.BLACK);
     border.setX(x);
     border.setY(y);
 
-    title = new Title(x, y, title);
+    this.title = new Text(x + title.length() * 2.2, y + height/2, title);
     this.getChildren().add(border);
+    this.getChildren().add(this.title);
   }
 
   public String getTitle() {
-    return this.title;
+    return this.title.getText();
   }
 
   public String getSubTitle() {
-    return this.subTitle;
+    return this.subTitle.getText();
   }
 
   public void setTitle(String title) {
-    this.title = title;
+    this.title.setText(title);
   }
 
   public void setSubTitle(String subTitle) {
-    this.subTitle = subTitle;
+    this.subTitle.setText(subTitle);
   }
 }

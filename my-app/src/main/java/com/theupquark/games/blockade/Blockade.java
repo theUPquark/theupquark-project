@@ -44,12 +44,17 @@ public class Blockade extends Pane {
   private Timeline gameplay;
   private MediaPlayer soundCollision;
 
+  private double boardWidth = 900;
+
   public Blockade() {
     this.setStyle("-fx-background-color: black");
-    this.setPrefWidth(900);
+    this.setPrefWidth(boardWidth);
     this.setGrid(10, 7);
 
-    msgLiveLost = new Popup("You aren't so good at this.", "Try better", 400, 400);
+    msgLiveLost = new Popup("You aren't so good at this.", 
+                            "Try better", 
+                            100, 300, 
+                            boardWidth/2 - 150, 400);
 
     ClassLoader classLoader = getClass().getClassLoader();
     //getResourceAsStream(--)?? 
