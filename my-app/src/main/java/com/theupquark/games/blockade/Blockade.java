@@ -200,6 +200,16 @@ public class Blockade extends Pane {
       this.playerFeedback.setTitle("Wow, you lost..");
 
       //TODO Reset bricks, lives, and score
+      List<Node> nodesHit = new ArrayList<>();
+      for (Node node : this.getChildren()) {
+            if (node instanceof Brick) {
+              nodesHit.add(node);
+            }
+      }
+      this.getChildren().removeAll(nodesHit);
+      this.score = 0;
+      this.lives =3;
+      setGrid(10, 7);
     }
 
     activeBall.setCenterX(200);
