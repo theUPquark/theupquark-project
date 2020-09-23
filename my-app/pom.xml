@@ -10,12 +10,24 @@
 
   <!-- Maintain versions for multiple dependencies -->
   <properties>
-    <jdk.version>1.8</jdk.version>
+    <jdk.version>11</jdk.version>
     <junit.version>3.8.1</junit.version>
     <log4j.version>1.2.17</log4j.version>
   </properties>
 
   <dependencies>
+<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>11</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -37,7 +49,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.8.1</version>
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
@@ -59,6 +71,17 @@
             <mainClass>com.theupquark.app.JavaFXWindow</mainClass>
           </manifest>
           </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Had to add this since broke something I guess, and just wanted it to work  -->
+      <!-- mvn javafx:run                                                             -->
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.4</version>
+        <configuration>
+          <mainClass>com.theupquark.app.JavaFXWindow</mainClass>
         </configuration>
       </plugin>
 
