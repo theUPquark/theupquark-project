@@ -19,9 +19,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-//import javafx.scene.media.AudioClip;
-//import javafx.scene.media.Media;
-//import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -47,7 +47,7 @@ public class Blockade extends Pane {
   private int score;
   
   private Timeline gameplay;
-  //private MediaPlayer soundCollision;
+  private MediaPlayer soundCollision;
 
   private double boardWidth = 900;
   private Random random = new Random();
@@ -71,9 +71,8 @@ public class Blockade extends Pane {
     this.getChildren().add(showScore);
 
     ClassLoader classLoader = getClass().getClassLoader();
-    //getResourceAsStream(--)?? 
-    //soundCollision = new MediaPlayer(new Media("http://cs.au.dk/~dsound/DigitalAudio.dir/Greenfoot/Pong.dir/sounds_ping_pong_8bit/ping_pong_8bit_plop.wav"));
-    //soundCollision.setCycleCount(1);
+    soundCollision = new MediaPlayer(new Media(classLoader.getSystemResource("plop.wav").toExternalForm()));
+    soundCollision.setOnEndOfMedia(() -> soundCollision.stop());
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
 
@@ -99,6 +98,21 @@ public class Blockade extends Pane {
  }
 
   /**
+   * Play Media. If already playing, restart it.
+   * Used when a sound could occur rapidly, and missing an activation
+   * would go noticed.
+   *
+   * @param media Media to play/restart
+   */
+  private void restartMedia(MediaPlayer media) {
+    if (media.getStatus().equals(MediaPlayer.Status.PLAYING)) {
+      media.seek(Duration.ZERO);
+    } else {
+      media.play();
+    }
+  }
+
+  /**
    * Start the activeBall bouncing.
    *
    * Moves the activeBall location based on current velocity.
@@ -122,9 +136,8 @@ public class Blockade extends Pane {
       if (node instanceof Shape && !(node instanceof Ball)) {
         Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
         if (intersect.getWidth() != -1) {
-          //soundCollision.play();
-          //System.out.println("# sounds; " + soundCollision.getCurrentCount());
           System.out.println(node.getClass() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
+          this.restartMedia(soundCollision);
           if (node instanceof Brick) {
             if (((Brick) node).removeBrick()) {
               //Results of specific brick types being broken can be defined here.
@@ -156,15 +169,19 @@ public class Blockade extends Pane {
 
     //reverse velocity on pane borders
     if (activeBall.getCenterY() < activeBall.getRadius()) {
+      this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
     } else if (activeBall.getCenterY() > this.getHeight() - activeBall.getRadius()) {
+      this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
       this.failConditionResult();
     }
 
     if (activeBall.getCenterX() < activeBall.getRadius()) {
+      this.restartMedia(soundCollision);
       activeBall.setVelocityX(-activeBall.getVelocityX());
     } else if (activeBall.getCenterX() > this.getWidth() - activeBall.getRadius()) {
+      this.restartMedia(soundCollision);
       activeBall.setVelocityX(-activeBall.getVelocityX());
     }
     
