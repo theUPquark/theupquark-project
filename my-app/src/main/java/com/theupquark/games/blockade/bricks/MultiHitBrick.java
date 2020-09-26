@@ -7,8 +7,10 @@ public class MultiHitBrick extends Brick {
 
   private int armor;
 
-  public MultiHitBrick(double x, double y, Paint fill) {
-    super(x, y, fill);
+  public MultiHitBrick(double x, double y) {
+    super(x, y);
+    // some visual like lattis pattern
+    this.setFill(Color.DARKGREEN);
     armor = 2;
   }
 

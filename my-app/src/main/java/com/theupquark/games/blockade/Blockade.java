@@ -7,6 +7,7 @@ import com.theupquark.ui.Popup;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -49,6 +50,7 @@ public class Blockade extends Pane {
   //private MediaPlayer soundCollision;
 
   private double boardWidth = 900;
+  private Random random = new Random();
 
   public Blockade() {
     this.setStyle("-fx-background-color: black");
@@ -75,9 +77,8 @@ public class Blockade extends Pane {
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
 
-    activeBall = new Ball(200, activePaddle.getY() - 11);
-    activeBall.setVelocityY(5);
-    activeBall.setVelocityX(5);
+    this.activeBall = new Ball(this.boardWidth / 2, activePaddle.getY() - 11, this.random);
+    this.activeBall.resetVelocity();
     this.getChildren().add(activeBall);
 
     gameplay = new Timeline(new KeyFrame(
@@ -86,10 +87,6 @@ public class Blockade extends Pane {
 
     this.setOnMouseMoved(event -> {
       activePaddle.setX(event.getX() - activePaddle.getWidth() / 2);
-
-      if (betweenGames) {
-        activeBall.setCenterX(activePaddle.getX() + activePaddle.getWidth() / 2);
-      }
     });
 
     this.setOnMousePressed(event -> {
@@ -148,12 +145,8 @@ public class Blockade extends Pane {
               }
             }
           } else if (node instanceof Paddle) {
-            //Paddle adjusts velocity based on position of interaction
-            double position = activeBall.getCenterX() - ((Paddle) node).getX() - ((Paddle) node).getWidth() / 2;
-            System.out.println("Relative ball position on paddle: " + position);
-            //TODO testing with adding velocity
-            activeBall.addVelocityX(Math.floor(position / 5));
-            activeBall.setVelocityY(-activeBall.getVelocityY());
+            Paddle paddle = Paddle.class.cast(node);
+            paddle.reboundBall(this.activeBall);
           }
         }
 
@@ -168,7 +161,6 @@ public class Blockade extends Pane {
       activeBall.setVelocityY(-activeBall.getVelocityY());
       this.failConditionResult();
     }
-
 
     if (activeBall.getCenterX() < activeBall.getRadius()) {
       activeBall.setVelocityX(-activeBall.getVelocityX());
@@ -207,11 +199,12 @@ public class Blockade extends Pane {
       }
       this.getChildren().removeAll(nodesHit);
       this.score = 0;
-      this.lives =3;
+      this.lives = 3;
       setGrid(10, 7);
     }
 
-    activeBall.setCenterX(200);
+    this.activeBall.resetVelocity();
+    activeBall.setCenterX(this.boardWidth / 2);
     activeBall.setCenterY(activePaddle.getY() - 11);
   }
   /**
@@ -229,8 +222,7 @@ public class Blockade extends Pane {
     for (int i = 0; i < gridLength; i++) {
       for (int j = 0; j < gridDepth; j++) {
         this.getChildren().add(new Brick(startX + i * Brick.getBrickWidth(),
-          startY + j * Brick.getBrickHeight(),
-          Color.GREEN));
+          startY + j * Brick.getBrickHeight()));
       }
     }
   }

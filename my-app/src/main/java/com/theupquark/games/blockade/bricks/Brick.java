@@ -10,13 +10,18 @@ public class Brick extends Rectangle {
   private static final double REC_HEIGHT = 25;
 
   public Brick(double x, double y, Paint fill) {
+    this(x, y);
+    this.setFill(fill);
+  }
+
+  public Brick(double x, double y) {
     this.setWidth(REC_WIDTH);
     this.setHeight(REC_HEIGHT);
 
     this.setX(x);
     this.setY(y);
 
-    this.setFill(fill);
+    this.setFill(Color.GREEN);
     this.setStroke(Color.BLACK);
   }
 
