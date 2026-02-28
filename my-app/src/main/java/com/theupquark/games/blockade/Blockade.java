@@ -2,6 +2,7 @@ package com.theupquark.games.blockade;
 
 import com.theupquark.games.blockade.balls.Ball;
 import com.theupquark.games.blockade.bricks.Brick;
+import com.theupquark.games.blockade.bricks.RandomColorBrick;
 import com.theupquark.games.blockade.paddles.Paddle;
 import com.theupquark.ui.Popup;
 
@@ -238,7 +239,7 @@ public class Blockade extends Pane {
     double startY = 30;
     for (int i = 0; i < gridLength; i++) {
       for (int j = 0; j < gridDepth; j++) {
-        this.getChildren().add(new Brick(startX + i * Brick.getBrickWidth(),
+        this.getChildren().add(new RandomColorBrick(startX + i * Brick.getBrickWidth(),
           startY + j * Brick.getBrickHeight()));
       }
     }
