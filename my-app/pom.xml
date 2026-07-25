@@ -11,37 +11,56 @@
   <!-- Maintain versions for multiple dependencies -->
   <properties>
     <jdk.version>25</jdk.version>
-    <junit.version>3.8.1</junit.version>
-    <log4j.version>1.2.17</log4j.version>
+    <javafx.version>23.0.2</javafx.version>
+    <junit.jupiter.version>5.11.4</junit.jupiter.version>
+    <log4j.version>2.25.5</log4j.version>
+    <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+    <javafx.plugin.version>0.0.8</javafx.plugin.version>
+    <surefire.plugin.version>3.5.2</surefire.plugin.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
+    <!-- OpenJFX Dependencies -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <version>11</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>11</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-media</artifactId>
-      <version>11</version>
+      <version>${javafx.version}</version>
     </dependency>
 
+    <!-- JUnit 5 Jupiter Dependencies -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Log4j 2 Dependencies -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
       <version>${log4j.version}</version>
     </dependency>
   </dependencies>
@@ -50,54 +69,51 @@
     <finalName>JavaFXApp</finalName>
     <plugins>
 
-      <!-- Set a JDK compiler level -->
+      <!-- Compiler plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>${maven.compiler.plugin.version}</version>
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
         </configuration>
       </plugin>
 
-      <!-- Make this jar executable -->
+      <!-- Surefire plugin for JUnit 5 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.plugin.version}</version>
+      </plugin>
+
+      <!-- Executable JAR manifest plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
         <configuration>
-          <!-- DO NOT include log4j.properties file in your Jar -->
           <excludes>
-          <exclude>**/log4j.properties</exclude>
+            <exclude>**/log4j2.xml</exclude>
           </excludes>
           <archive>
-          <manifest>
-            <!-- Jar file entry point -->
-            <mainClass>com.theupquark.app.JavaFXWindow</mainClass>
-          </manifest>
+            <manifest>
+              <mainClass>com.theupquark.app.JavaFXWindow</mainClass>
+            </manifest>
           </archive>
         </configuration>
       </plugin>
 
-      <!-- Had to add this since broke something I guess, and just wanted it to work  -->
-      <!-- mvn javafx:run                                                             -->
+      <!-- OpenJFX Maven Plugin -->
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.4</version>
+        <version>${javafx.plugin.version}</version>
         <configuration>
           <mainClass>com.theupquark.app.JavaFXWindow</mainClass>
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>com.zenjava</groupId>
-        <artifactId>javafx-maven-plugin</artifactId>
-        <version>8.7.0</version>
-        <configuration>
-          <mainClass>com.theupquark.app.JavaFXWindow</mainClass>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>
