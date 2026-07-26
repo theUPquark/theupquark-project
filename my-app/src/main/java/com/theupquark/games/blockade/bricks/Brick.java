@@ -1,10 +1,10 @@
 package com.theupquark.games.blockade.bricks;
 
-import javafx.scene.shape.Rectangle;
+import com.theupquark.games.common.Killable;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-public class Brick extends Rectangle {
+public class Brick extends Killable {
 
   private static final double REC_WIDTH = 80;
   private static final double REC_HEIGHT = 25;
@@ -39,6 +39,28 @@ public class Brick extends Rectangle {
    * @return true always by default
    */
   public boolean removeBrick() {
+    if (removeCondition()) {
+      die();
+      return true;
+    } 
+    return false;
+  }
+
+  public boolean removeCondition() {
     return true;
+  }
+
+  // Fade Brick away
+  private static int DEATH_STEPS_END = 20;
+  private int deathSteps = 0;
+  @Override
+  public boolean proceedToDie() {
+    this.setY(this.getY() + 5);
+    this.setOpacity(this.getOpacity() - 0.05);
+    if (++this.deathSteps > DEATH_STEPS_END) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

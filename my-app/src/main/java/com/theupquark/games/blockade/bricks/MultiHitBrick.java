@@ -15,7 +15,7 @@ public class MultiHitBrick extends Brick {
   }
 
   @Override
-  public boolean removeBrick() {
+  public boolean removeCondition() {
     if (--armor <= 0) {
       return true;
     } else {

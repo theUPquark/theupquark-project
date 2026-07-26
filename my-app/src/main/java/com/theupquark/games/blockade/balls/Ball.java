@@ -70,4 +70,5 @@ public class Ball extends Circle {
     this.setVelocityY(-5);
     this.setVelocityX(Math.floor(this.random.nextDouble() * 10 - 5));
   }
+
 }

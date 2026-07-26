@@ -4,11 +4,15 @@ import com.theupquark.games.blockade.balls.Ball;
 import com.theupquark.games.blockade.bricks.Brick;
 import com.theupquark.games.blockade.bricks.RandomColorBrick;
 import com.theupquark.games.blockade.paddles.Paddle;
+import com.theupquark.games.common.Killable;
 import com.theupquark.ui.Popup;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -52,6 +56,8 @@ public class Blockade extends Pane {
 
   private double boardWidth = 900;
   private Random random = new Random();
+
+  record TrackedCollision(Node node, Bounds collision) {  }
 
   public Blockade() {
     this.setStyle("-fx-background-color: black");
@@ -130,25 +136,31 @@ public class Blockade extends Pane {
     activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
 
     //Actions on intersect with activeBall
-    List<Node> nodesHit = new ArrayList<>();
-    boolean firstCollision = true;
+    AtomicBoolean firstCollision = new AtomicBoolean(true);
 
-    for (Node node : this.getChildren()) {
-      if (node instanceof Shape && !(node instanceof Ball)) {
+    List<Killable> forRemoval = this.getChildren().stream()
+      .filter(Shape.class::isInstance)
+      .filter(Predicate.not(Ball.class::isInstance))
+      .map(node -> {
         Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
+        return new TrackedCollision(node, intersect);
+      })
+      .map(trackedCollision -> {
+        Node node = trackedCollision.node();
+        Bounds intersect = trackedCollision.collision();
+        // Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
         if (intersect.getWidth() != -1) {
           System.out.println(node.getClass() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
-          this.restartMedia(soundCollision);
-          if (node instanceof Brick) {
-            if (((Brick) node).removeBrick()) {
+          if (node instanceof Brick brick && brick.collisionEnabled()) {
+            this.restartMedia(soundCollision);
+            if (brick.removeBrick()) {
               //Results of specific brick types being broken can be defined here.
-              nodesHit.add(node);
               score++;
             }
             //Adjust velocity for only the first collision.
             //TODO might need check for separate X/Y adjustments
-            if (firstCollision) {
-              firstCollision = false;
+            if (firstCollision.get()) {
+              firstCollision.set(false);
               if (intersect.getWidth() > intersect.getHeight()) {
                 activeBall.setVelocityY(-activeBall.getVelocityY());
               } else if (intersect.getWidth() < intersect.getHeight()) {
@@ -158,26 +170,33 @@ public class Blockade extends Pane {
                 activeBall.setVelocityY(-activeBall.getVelocityY());
               }
             }
-          } else if (node instanceof Paddle) {
-            Paddle paddle = Paddle.class.cast(node);
+          } else if (node instanceof Paddle paddle) {
+            this.restartMedia(soundCollision);
             paddle.reboundBall(this.activeBall);
           }
         }
+        return node;
+      })
+      .filter(Killable.class::isInstance)
+      .map(Killable.class::cast)
+      .filter(Killable::isDead)
+      .filter(Killable::proceedToDie)
+      .collect(Collectors.toList());
 
-      }
-    }
-    this.getChildren().removeAll(nodesHit);
+    this.getChildren().removeAll(forRemoval);
 
-    //reverse velocity on pane borders
     if (activeBall.getCenterY() < activeBall.getRadius()) {
+      // Ball bounces off top
       this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
     } else if (activeBall.getCenterY() > this.getHeight() - activeBall.getRadius()) {
+      // Lose when ball hits bottom
       this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
       this.failConditionResult();
     }
 
+    // Ball bounces off sides
     if (activeBall.getCenterX() < activeBall.getRadius()) {
       this.restartMedia(soundCollision);
       activeBall.setVelocityX(-activeBall.getVelocityX());
