@@ -1,6 +1,7 @@
 package com.theupquark.games.blockade.bricks;
 
 import com.theupquark.games.common.Killable;
+import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -8,6 +9,9 @@ public class Brick extends Killable {
 
   private static final double REC_WIDTH = 80;
   private static final double REC_HEIGHT = 25;
+
+  // Track most recent collision (most likely with Ball)
+  protected Bounds collision;
 
   public Brick(double x, double y, Paint fill) {
     this(x, y);
@@ -38,7 +42,8 @@ public class Brick extends Killable {
    *
    * @return true always by default
    */
-  public boolean removeBrick() {
+  public boolean removeBrick(Bounds collision) {
+    this.collision = collision;
     if (removeCondition()) {
       die();
       return true;
@@ -53,6 +58,7 @@ public class Brick extends Killable {
   // Fade Brick away
   private static int DEATH_STEPS_END = 20;
   private int deathSteps = 0;
+
   @Override
   public boolean proceedToDie() {
     this.setY(this.getY() + 5);

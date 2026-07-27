@@ -8,7 +8,7 @@ import javafx.scene.shape.Rectangle;
 public class Paddle extends Rectangle {
 
   public Paddle(double x, double y) {
-    super(x, y, 75, 15);
+    super(x, y, 75, 10);
     this.setFill(Color.BLUE);
   }
 

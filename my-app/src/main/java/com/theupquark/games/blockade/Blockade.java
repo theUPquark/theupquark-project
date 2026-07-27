@@ -50,6 +50,7 @@ public class Blockade extends Pane {
   private Text showScore;
   private int lives;
   private int score;
+  private AtomicBoolean winCondition = new AtomicBoolean(false);
   
   private Timeline gameplay;
   private MediaPlayer soundCollision;
@@ -148,13 +149,13 @@ public class Blockade extends Pane {
       .map(trackedCollision -> {
         Node node = trackedCollision.node();
         Bounds intersect = trackedCollision.collision();
-        // Bounds intersect = Shape.intersect( (Shape) node, activeBall).getBoundsInLocal();
         if (intersect.getWidth() != -1) {
-          System.out.println(node.getClass() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
           if (node instanceof Brick brick && brick.collisionEnabled()) {
+            System.out.println(node.getClass().getSimpleName() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
             this.restartMedia(soundCollision);
-            if (brick.removeBrick()) {
-              //Results of specific brick types being broken can be defined here.
+            if (brick.removeBrick(intersect)) {
+              // TODO Method in Brick to get point value
+              // TODO More points for multiple bricks hit. Resets when hit by paddle again.
               score++;
             }
             //Adjust velocity for only the first collision.
@@ -171,8 +172,10 @@ public class Blockade extends Pane {
               }
             }
           } else if (node instanceof Paddle paddle) {
+            System.out.println(node.getClass().getSimpleName() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
             this.restartMedia(soundCollision);
             paddle.reboundBall(this.activeBall);
+            this.checkWinCondition();
           }
         }
         return node;
@@ -189,6 +192,7 @@ public class Blockade extends Pane {
       // Ball bounces off top
       this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
+      this.checkWinCondition();
     } else if (activeBall.getCenterY() > this.getHeight() - activeBall.getRadius()) {
       // Lose when ball hits bottom
       this.restartMedia(soundCollision);
@@ -208,6 +212,24 @@ public class Blockade extends Pane {
     //update ui elements
     this.showScore.setText("Score: " + this.getScore());
     this.showLives.setText("Lives: " + this.getLives());
+
+    if (this.winCondition.get()) {
+      this.onWin();
+    }
+  }
+
+  void checkWinCondition() {
+    if (this.getChildren().stream().noneMatch(n -> (n instanceof Brick brick) && !brick.isDead())) {
+      this.winCondition.set(true);
+    }
+  }
+
+  void onWin() {
+    // TODO Play a sound
+    // TODO List of levels to progress through
+    // TODO In the original game, the Ball was paused while the grid reset
+    this.winCondition.set(false);
+    setGrid(10, 7);
   }
 
   /**
@@ -225,9 +247,8 @@ public class Blockade extends Pane {
 
     if (lives < 0) {
       //GAME OVER
-      this.playerFeedback.setTitle("Wow, you lost..");
+      this.playerFeedback.setTitle("GAME OVER");
 
-      //TODO Reset bricks, lives, and score
       List<Node> nodesHit = new ArrayList<>();
       for (Node node : this.getChildren()) {
             if (node instanceof Brick) {
