@@ -2,6 +2,7 @@ package com.theupquark.games.blockade;
 
 import com.theupquark.games.blockade.balls.Ball;
 import com.theupquark.games.blockade.bricks.Brick;
+import com.theupquark.games.blockade.bricks.BrickDebris;
 import com.theupquark.games.blockade.bricks.RandomColorBrick;
 import com.theupquark.games.blockade.paddles.Paddle;
 import com.theupquark.games.common.Killable;
@@ -78,9 +79,8 @@ public class Blockade extends Pane {
     this.getChildren().add(showLives);
     this.getChildren().add(showScore);
 
-    ClassLoader classLoader = getClass().getClassLoader();
-    soundCollision = new MediaPlayer(new Media(classLoader.getSystemResource("plop.wav").toExternalForm()));
-    soundCollision.setOnEndOfMedia(() -> soundCollision.stop());
+    this.warmup();
+
     activePaddle = new Paddle(200, 500);
     this.getChildren().add(activePaddle);
 
@@ -104,6 +104,18 @@ public class Blockade extends Pane {
     });
 
  }
+
+   /**
+   * Avoid slowdown during gameplay.
+   */
+  void warmup() {
+    new BrickDebris(0, 0, 1, 1, Color.TRANSPARENT, 0, 0, 0);
+
+    // TODO Something is causing the first Brick hit to freeze now. I think it is the sound.
+    ClassLoader classLoader = getClass().getClassLoader();
+    soundCollision = new MediaPlayer(new Media(classLoader.getSystemResource("plop.wav").toExternalForm()));
+    soundCollision.setOnEndOfMedia(() -> soundCollision.stop());
+  }
 
   /**
    * Play Media. If already playing, restart it.
@@ -153,6 +165,7 @@ public class Blockade extends Pane {
         if (intersect.getWidth() != -1) {
           if (node instanceof Brick brick && brick.collisionEnabled()) {
             System.out.println(node.getClass().getSimpleName() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
+            // TODO Something about the sound playing freezes on the first hit now
             this.restartMedia(soundCollision);
             if (brick.removeBrick(intersect)) {
               // TODO Method in Brick to get point value
@@ -160,8 +173,8 @@ public class Blockade extends Pane {
               score++;
               newDebris.addAll(brick.spawnDebris());
             }
-            //Adjust velocity for only the first collision.
-            //TODO might need check for separate X/Y adjustments
+            // Adjust velocity for only the first collision.
+            // TODO might need check for separate X/Y adjustments
             if (firstCollision.get()) {
               firstCollision.set(false);
               if (intersect.getWidth() > intersect.getHeight()) {
@@ -173,6 +186,7 @@ public class Blockade extends Pane {
                 activeBall.setVelocityY(-activeBall.getVelocityY());
               }
             }
+            // TODO If we hit more than one brick in a loop, try flipping the velocity again, so it "slices" through them and keeps going.
           } else if (node instanceof Paddle paddle) {
             System.out.println(node.getClass().getSimpleName() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
             this.restartMedia(soundCollision);
