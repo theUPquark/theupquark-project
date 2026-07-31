@@ -5,6 +5,9 @@ import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Brick extends Killable {
 
   private static final double REC_WIDTH = 80;
@@ -55,18 +58,46 @@ public class Brick extends Killable {
     return true;
   }
 
-  // Fade Brick away
-  private static int DEATH_STEPS_END = 20;
-  private int deathSteps = 0;
-
   @Override
   public boolean proceedToDie() {
-    this.setY(this.getY() + 5);
-    this.setOpacity(this.getOpacity() - 0.05);
-    if (++this.deathSteps > DEATH_STEPS_END) {
-      return true;
-    } else {
-      return false;
+    // Remove original brick shape immediately on death so debris shards take over
+    return true;
+  }
+
+  // Spawns pieces that explode outward from the brick's position.
+  public List<BrickDebris> spawnDebris() {
+    List<BrickDebris> shards = new ArrayList<>();
+    int cols = 4;
+    int rows = 2;
+
+    // Each piece size
+    double pieceW = this.getWidth() / cols;
+    double pieceH = this.getHeight() / rows;
+
+    // Center of each piece
+    // Recall that (x,y) coordinates are the upper-left corner
+    double cx = this.getX() + this.getWidth() / 2.0;
+    double cy = this.getY() + this.getHeight() / 2.0;
+
+    for (int col = 0; col < cols; col++) {
+      for (int row = 0; row < rows; row++) {
+        double px = this.getX() + col * pieceW;
+        double py = this.getY() + row * pieceH;
+        double pcx = px + pieceW / 2.0;
+        double pcy = py + pieceH / 2.0;
+
+        // Radiate debris out from the center of the original Brick
+        // When debris is left side of original Brick, move left. Ride side, move right.
+        double dirX = pcx - cx;
+        double dirY = pcy - cy;
+        double speed = 2.0 + Math.random() * 4.0;
+        double vx = (dirX == 0 ? (Math.random() - 0.5) : Math.signum(dirX)) * speed + (Math.random() - 0.5) * 2.0;
+        double vy = (dirY == 0 ? -1.0 : Math.signum(dirY)) * speed + (Math.random() - 0.5) * 2.0 - 2.0;
+        double spin = (Math.random() - 0.5) * 30.0;
+
+        shards.add(new BrickDebris(px, py, pieceW, pieceH, this.getFill(), vx, vy, spin));
+      }
     }
+    return shards;
   }
 }

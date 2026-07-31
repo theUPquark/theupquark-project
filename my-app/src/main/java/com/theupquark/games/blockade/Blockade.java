@@ -138,6 +138,7 @@ public class Blockade extends Pane {
 
     //Actions on intersect with activeBall
     AtomicBoolean firstCollision = new AtomicBoolean(true);
+    List<Node> newDebris = new ArrayList<>();
 
     List<Killable> forRemoval = this.getChildren().stream()
       .filter(Shape.class::isInstance)
@@ -157,6 +158,7 @@ public class Blockade extends Pane {
               // TODO Method in Brick to get point value
               // TODO More points for multiple bricks hit. Resets when hit by paddle again.
               score++;
+              newDebris.addAll(brick.spawnDebris());
             }
             //Adjust velocity for only the first collision.
             //TODO might need check for separate X/Y adjustments
@@ -187,6 +189,7 @@ public class Blockade extends Pane {
       .collect(Collectors.toList());
 
     this.getChildren().removeAll(forRemoval);
+    this.getChildren().addAll(newDebris);
 
     if (activeBall.getCenterY() < activeBall.getRadius()) {
       // Ball bounces off top
