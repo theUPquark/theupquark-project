@@ -10,7 +10,7 @@ public class RandomColorBrick extends Brick {
    * properties.
    */
   public RandomColorBrick(double x, double y) {
-    super(x, y, new Color(Math.random(), Math.random(), Math.random(), 1));
+    super(x, y, new Color(Math.random(), Math.random(), 1, 1));
   }
 
 }

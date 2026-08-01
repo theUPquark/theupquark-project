@@ -1,5 +1,7 @@
 package com.theupquark.games.blockade.bricks;
 
+import com.theupquark.games.blockade.balls.Ball;
+
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -15,8 +17,9 @@ public class MultiHitBrick extends Brick {
   }
 
   @Override
-  public boolean removeCondition() {
-    if (--armor <= 0) {
+  public boolean removeCondition(Ball instigator) {
+    this.armor -= instigator.getDamage();
+    if (armor <= 0) {
       return true;
     } else {
       return false;

@@ -1,5 +1,6 @@
 package com.theupquark.games.blockade.bricks;
 
+import com.theupquark.games.blockade.balls.Ball;
 import com.theupquark.games.common.Killable;
 import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
@@ -45,16 +46,16 @@ public class Brick extends Killable {
    *
    * @return true always by default
    */
-  public boolean removeBrick(Bounds collision) {
+  public boolean removeBrick(Bounds collision, Ball instigator) {
     this.collision = collision;
-    if (removeCondition()) {
+    if (removeCondition(instigator)) {
       die();
       return true;
     } 
     return false;
   }
 
-  public boolean removeCondition() {
+  public boolean removeCondition(Ball instigator) {
     return true;
   }
 

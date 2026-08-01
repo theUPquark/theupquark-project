@@ -12,6 +12,8 @@ public class Ball extends Circle {
 
   private Random random;
 
+  private int damage = 1;
+
   public Ball(double centerX, double centerY, Random random) {
     super(centerX, centerY, 10, Color.WHITE);
     this.random = random;
@@ -69,6 +71,19 @@ public class Ball extends Circle {
   public void resetVelocity() {
     this.setVelocityY(-5);
     this.setVelocityX(Math.floor(this.random.nextDouble() * 10 - 5));
+  }
+
+  public int getDamage() {
+    return this.damage;
+  }
+
+  public void setDamage(int damage) {
+    this.damage = damage;
+  }
+
+  public void returnToNormal() {
+    this.damage = 1;
+    this.setFill(Color.WHITE);
   }
 
 }

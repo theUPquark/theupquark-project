@@ -3,6 +3,7 @@ package com.theupquark.games.blockade;
 import com.theupquark.games.blockade.balls.Ball;
 import com.theupquark.games.blockade.bricks.Brick;
 import com.theupquark.games.blockade.bricks.BrickDebris;
+import com.theupquark.games.blockade.bricks.LavaBrick;
 import com.theupquark.games.blockade.bricks.RandomColorBrick;
 import com.theupquark.games.blockade.paddles.Paddle;
 import com.theupquark.games.common.Killable;
@@ -108,7 +109,7 @@ public class Blockade extends Pane {
    /**
    * Avoid slowdown during gameplay.
    */
-  void warmup() {
+  private void warmup() {
     new BrickDebris(0, 0, 1, 1, Color.TRANSPARENT, 0, 0, 0);
 
     // TODO Something is causing the first Brick hit to freeze now. I think it is the sound.
@@ -143,7 +144,7 @@ public class Blockade extends Pane {
    * Any Bricks that return true for removeBrick will be removed from rendering.
    * 
    */
-  public void startBall() {
+  private void startBall() {
     this.getChildren().remove(playerFeedback);
     activeBall.setCenterY(activeBall.getCenterY() + activeBall.getVelocityY());
     activeBall.setCenterX(activeBall.getCenterX() + activeBall.getVelocityX());
@@ -167,7 +168,7 @@ public class Blockade extends Pane {
             System.out.println(node.getClass().getSimpleName() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
             // TODO Something about the sound playing freezes on the first hit now
             this.restartMedia(soundCollision);
-            if (brick.removeBrick(intersect)) {
+            if (brick.removeBrick(intersect, activeBall)) {
               // TODO Method in Brick to get point value
               // TODO More points for multiple bricks hit. Resets when hit by paddle again.
               score++;
@@ -235,13 +236,13 @@ public class Blockade extends Pane {
     }
   }
 
-  void checkWinCondition() {
+  private void checkWinCondition() {
     if (this.getChildren().stream().noneMatch(n -> (n instanceof Brick brick) && !brick.isDead())) {
       this.winCondition.set(true);
     }
   }
 
-  void onWin() {
+  private void onWin() {
     // TODO Play a sound
     // TODO List of levels to progress through
     // TODO In the original game, the Ball was paused while the grid reset
@@ -253,7 +254,7 @@ public class Blockade extends Pane {
    * Lose 'life' when ball hits the lower edge of the pane, 
    * and respawn ball with game 'paused'
    */
-  public void failConditionResult() {
+  private void failConditionResult() {
     betweenGames = true;
     gameplay.pause();
     lives--;
@@ -300,6 +301,9 @@ public class Blockade extends Pane {
           startY + j * Brick.getBrickHeight()));
       }
     }
+    // TESTING LLAAVA
+    this.getChildren().add(new LavaBrick(startX + Brick.getBrickWidth(),
+          startY + gridDepth * Brick.getBrickHeight()));
   }
 
   /**
