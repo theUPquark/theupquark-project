@@ -1,10 +1,16 @@
 package com.theupquark.games.blockade.balls;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import com.theupquark.games.blockade.event.Event;
+import com.theupquark.games.blockade.event.HoldsEvents;
+
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 
-public class Ball extends Circle {
+public class Ball extends Circle implements HoldsEvents {
 
   private double velocityX;
   private double velocityY;
@@ -14,6 +20,12 @@ public class Ball extends Circle {
 
   private int damage = 1;
 
+  // When slice == true, the ball won't rebound off bricks, but keep going
+  // TODO Refactor so that more logic about ball movement is in this class
+  private boolean slice = false;
+
+  private List<Event> events = new ArrayList<>();
+
   public Ball(double centerX, double centerY, Random random) {
     super(centerX, centerY, 10, Color.WHITE);
     this.random = random;
@@ -21,6 +33,11 @@ public class Ball extends Circle {
     velocityY = 0;
 
     velocityCap = 20;
+  }
+
+  @Override
+  public List<Event> getEvents() {
+    return this.events;
   }
 
   public void setVelocityX(double velocityX) {
@@ -81,9 +98,18 @@ public class Ball extends Circle {
     this.damage = damage;
   }
 
+  public void setSlice(boolean slice) {
+    this.slice = slice;
+  }
+
+  public boolean isSlicing() {
+    return this.slice;
+  }
+
   public void returnToNormal() {
     this.damage = 1;
     this.setFill(Color.WHITE);
+    this.slice = false;
   }
 
 }

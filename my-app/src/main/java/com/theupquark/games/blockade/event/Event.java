@@ -14,9 +14,10 @@ import javafx.scene.shape.Shape;
 */
 public class Event {
 
-  enum GamePhase {
+  public enum GamePhase {
     BrickCollision,
-    TBD
+    HitBorder,
+    Last
   }
 
   public interface GameCondition {
@@ -27,8 +28,8 @@ public class Event {
   }
   
   private Blockade game;
-  private GamePhase phase;
-  private GameCondition condition;
+  private GamePhase phase = GamePhase.Last;
+  private GameCondition condition = (game) -> true;
   private GameAction gameAction;
   private boolean unregister = false;
 
@@ -55,10 +56,15 @@ public class Event {
     return this;
   }
 
+  public GamePhase getPhase() {
+    return this.phase;
+  }
+
   public boolean takeAction() {
     // Check game phase -- might not do this. It could just be where Blockade decides to place this Event.
     if (this.condition.test(this.game)) {
       this.gameAction.apply(game);
+      this.unregister = true;
       return true;
     }
     return false;
@@ -67,6 +73,11 @@ public class Event {
   public boolean unregister() {
     // TODO Maybe we could reference Blockade here and do whatever "unregister" would do, but might be better to have a cleanup in the main game loop (like how we remove blocks)
     return this.unregister;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder("Event during ").append(getPhase()).toString();
   }
 
 }

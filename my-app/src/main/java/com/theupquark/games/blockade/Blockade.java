@@ -5,6 +5,8 @@ import com.theupquark.games.blockade.bricks.Brick;
 import com.theupquark.games.blockade.bricks.BrickDebris;
 import com.theupquark.games.blockade.bricks.LavaBrick;
 import com.theupquark.games.blockade.bricks.RandomColorBrick;
+import com.theupquark.games.blockade.event.Event;
+import com.theupquark.games.blockade.event.HoldsEvents;
 import com.theupquark.games.blockade.paddles.Paddle;
 import com.theupquark.games.common.Killable;
 import com.theupquark.ui.Popup;
@@ -112,10 +114,10 @@ public class Blockade extends Pane {
   private void warmup() {
     new BrickDebris(0, 0, 1, 1, Color.TRANSPARENT, 0, 0, 0);
 
-    // TODO Something is causing the first Brick hit to freeze now. I think it is the sound.
     ClassLoader classLoader = getClass().getClassLoader();
     soundCollision = new MediaPlayer(new Media(classLoader.getSystemResource("plop.wav").toExternalForm()));
     soundCollision.setOnEndOfMedia(() -> soundCollision.stop());
+    this.restartMedia(soundCollision);
   }
 
   /**
@@ -166,7 +168,6 @@ public class Blockade extends Pane {
         if (intersect.getWidth() != -1) {
           if (node instanceof Brick brick && brick.collisionEnabled()) {
             System.out.println(node.getClass().getSimpleName() + ": " + intersect.getWidth() + ", " + intersect.getHeight());
-            // TODO Something about the sound playing freezes on the first hit now
             this.restartMedia(soundCollision);
             if (brick.removeBrick(intersect, activeBall)) {
               // TODO Method in Brick to get point value
@@ -176,7 +177,7 @@ public class Blockade extends Pane {
             }
             // Adjust velocity for only the first collision.
             // TODO might need check for separate X/Y adjustments
-            if (firstCollision.get()) {
+            if (firstCollision.get() && !activeBall.isSlicing()) {
               firstCollision.set(false);
               if (intersect.getWidth() > intersect.getHeight()) {
                 activeBall.setVelocityY(-activeBall.getVelocityY());
@@ -210,11 +211,13 @@ public class Blockade extends Pane {
       // Ball bounces off top
       this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
+      activeBall.trigger(Event.GamePhase.HitBorder);
       this.checkWinCondition();
     } else if (activeBall.getCenterY() > this.getHeight() - activeBall.getRadius()) {
       // Lose when ball hits bottom
       this.restartMedia(soundCollision);
       activeBall.setVelocityY(-activeBall.getVelocityY());
+      activeBall.trigger(Event.GamePhase.HitBorder);
       this.failConditionResult();
     }
 
@@ -222,10 +225,19 @@ public class Blockade extends Pane {
     if (activeBall.getCenterX() < activeBall.getRadius()) {
       this.restartMedia(soundCollision);
       activeBall.setVelocityX(-activeBall.getVelocityX());
+      activeBall.trigger(Event.GamePhase.HitBorder);
     } else if (activeBall.getCenterX() > this.getWidth() - activeBall.getRadius()) {
       this.restartMedia(soundCollision);
       activeBall.setVelocityX(-activeBall.getVelocityX());
+      activeBall.trigger(Event.GamePhase.HitBorder);
     }
+
+    // Clean up any events
+    this.getChildren().stream()
+      .filter(HoldsEvents.class::isInstance)
+      .map(HoldsEvents.class::cast)
+      .forEach(HoldsEvents::unregisterEvents);
+
     
     //update ui elements
     this.showScore.setText("Score: " + this.getScore());
@@ -325,5 +337,12 @@ public class Blockade extends Pane {
    */
   public int getLives() {
     return this.lives;
+  }
+
+  public void registerEvent(Event event) {
+    switch (event.getPhase()) {
+      // case Event.GamePhase.BrickCollision -> System.out.println("Register BrickCollision Event");
+      default -> System.out.println("Unhandled event : " + event.toString());
+    }
   }
 }
