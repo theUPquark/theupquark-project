@@ -11,6 +11,8 @@ import javafx.scene.shape.Shape;
  * 
  * The goal is to define events in objects (ex Bricks, Ball, Paddle).
  * The same objects, with a reference to Blockade, can register those events when their methods are called.
+ * 
+ * Blockade will determine GamePhase, and decide when to ask objects to activate their registered Events.
 */
 public class Event {
 
@@ -32,6 +34,7 @@ public class Event {
   private GameCondition condition = (game) -> true;
   private GameAction gameAction;
   private boolean unregister = false;
+  private int charges = 1;
 
   private Event(Blockade game) {
     this.game = game;
@@ -56,6 +59,12 @@ public class Event {
     return this;
   }
 
+  // If charges == -1, Events will not unregister and will never be removed.
+  public Event times(int charges) {
+    this.charges = charges;
+    return this;
+  }
+
   public GamePhase getPhase() {
     return this.phase;
   }
@@ -64,7 +73,12 @@ public class Event {
     // Check game phase -- might not do this. It could just be where Blockade decides to place this Event.
     if (this.condition.test(this.game)) {
       this.gameAction.apply(game);
-      this.unregister = true;
+      if (this.charges > 0) {
+        this.charges--;
+        if (this.charges <= 0) {
+          this.unregister = true;
+        }
+      }      
       return true;
     }
     return false;

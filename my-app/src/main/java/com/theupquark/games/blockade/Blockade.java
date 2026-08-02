@@ -232,7 +232,7 @@ public class Blockade extends Pane {
       activeBall.trigger(Event.GamePhase.HitBorder);
     }
 
-    // Clean up any events
+    // Clean up spent events
     this.getChildren().stream()
       .filter(HoldsEvents.class::isInstance)
       .map(HoldsEvents.class::cast)
