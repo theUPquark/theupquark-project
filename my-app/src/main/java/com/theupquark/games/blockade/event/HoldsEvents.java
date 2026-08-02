@@ -2,6 +2,8 @@ package com.theupquark.games.blockade.event;
 
 import java.util.List;
 
+import com.theupquark.games.blockade.Blockade;
+
 public interface HoldsEvents {
   List<Event> getEvents();
 
@@ -9,10 +11,10 @@ public interface HoldsEvents {
     getEvents().add(event);
   }
 
-  default void trigger(Event.GamePhase phase) {
+  default void trigger(Blockade game, Event.GamePhase phase) {
     getEvents().stream()
       .filter(event -> event.getPhase() == phase)
-      .forEach(Event::takeAction);
+      .forEach(event -> event.takeAction(game));
   }
 
   default void unregisterEvents() {

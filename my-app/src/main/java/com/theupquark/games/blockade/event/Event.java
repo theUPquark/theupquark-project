@@ -29,24 +29,18 @@ public class Event {
     void apply(Blockade game);
   }
   
-  private Blockade game;
   private GamePhase phase = GamePhase.Last;
   private GameCondition condition = (game) -> true;
   private GameAction gameAction;
   private boolean unregister = false;
   private int charges = 1;
 
-  private Event(Blockade game) {
-    this.game = game;
-  }
-
-  public static Event in(Blockade game) {
-    return new Event(game);
-  }
-
-  public Event during(GamePhase phase) {
+  private Event(GamePhase phase) {
     this.phase = phase;
-    return this;
+  }
+
+  public static Event during(GamePhase phase) {
+    return new Event(phase);
   }
 
   public Event when(GameCondition condition) {
@@ -69,9 +63,9 @@ public class Event {
     return this.phase;
   }
 
-  public boolean takeAction() {
+  public boolean takeAction(Blockade game) {
     // Check game phase -- might not do this. It could just be where Blockade decides to place this Event.
-    if (this.condition.test(this.game)) {
+    if (this.condition.test(game)) {
       this.gameAction.apply(game);
       if (this.charges > 0) {
         this.charges--;

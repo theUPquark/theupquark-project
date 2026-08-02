@@ -8,6 +8,7 @@ import com.theupquark.games.blockade.bricks.RandomColorBrick;
 import com.theupquark.games.blockade.event.Event;
 import com.theupquark.games.blockade.event.HoldsEvents;
 import com.theupquark.games.blockade.paddles.Paddle;
+import com.theupquark.games.common.GameAware;
 import com.theupquark.games.common.Killable;
 import com.theupquark.ui.Popup;
 
@@ -79,17 +80,18 @@ public class Blockade extends Pane {
     this.showLives.setFill(Color.WHITE);
     this.showScore = new Text(750, 550, "Score: " + this.getScore());
     this.showScore.setFill(Color.WHITE);
-    this.getChildren().add(showLives);
-    this.getChildren().add(showScore);
+    this.addGameObject(showLives);
+    this.addGameObject(showScore);
 
     this.warmup();
 
     activePaddle = new Paddle(200, 500);
-    this.getChildren().add(activePaddle);
+    this.addGameObject(activePaddle);
 
     this.activeBall = new Ball(this.boardWidth / 2, activePaddle.getY() - 11, this.random);
     this.activeBall.resetVelocity();
-    this.getChildren().add(activeBall);
+    this.activeBall.registerBorderBounceEvents();
+    this.addGameObject(activeBall);
 
     gameplay = new Timeline(new KeyFrame(
         Duration.millis(30), e-> this.startBall()));
@@ -133,6 +135,10 @@ public class Blockade extends Pane {
     } else {
       media.play();
     }
+  }
+
+  public void restartSoundCollision() {
+    this.restartMedia(soundCollision);
   }
 
   /**
@@ -207,30 +213,8 @@ public class Blockade extends Pane {
     this.getChildren().removeAll(forRemoval);
     this.getChildren().addAll(newDebris);
 
-    if (activeBall.getCenterY() < activeBall.getRadius()) {
-      // Ball bounces off top
-      this.restartMedia(soundCollision);
-      activeBall.setVelocityY(-activeBall.getVelocityY());
-      activeBall.trigger(Event.GamePhase.HitBorder);
-      this.checkWinCondition();
-    } else if (activeBall.getCenterY() > this.getHeight() - activeBall.getRadius()) {
-      // Lose when ball hits bottom
-      this.restartMedia(soundCollision);
-      activeBall.setVelocityY(-activeBall.getVelocityY());
-      activeBall.trigger(Event.GamePhase.HitBorder);
-      this.failConditionResult();
-    }
-
-    // Ball bounces off sides
-    if (activeBall.getCenterX() < activeBall.getRadius()) {
-      this.restartMedia(soundCollision);
-      activeBall.setVelocityX(-activeBall.getVelocityX());
-      activeBall.trigger(Event.GamePhase.HitBorder);
-    } else if (activeBall.getCenterX() > this.getWidth() - activeBall.getRadius()) {
-      this.restartMedia(soundCollision);
-      activeBall.setVelocityX(-activeBall.getVelocityX());
-      activeBall.trigger(Event.GamePhase.HitBorder);
-    }
+    // Trigger HitBorder phase events for ball (e.g. side bouncing)
+    activeBall.trigger(this, Event.GamePhase.HitBorder);
 
     // Clean up spent events
     this.getChildren().stream()
@@ -248,7 +232,7 @@ public class Blockade extends Pane {
     }
   }
 
-  private void checkWinCondition() {
+  public void checkWinCondition() {
     if (this.getChildren().stream().noneMatch(n -> (n instanceof Brick brick) && !brick.isDead())) {
       this.winCondition.set(true);
     }
@@ -266,7 +250,7 @@ public class Blockade extends Pane {
    * Lose 'life' when ball hits the lower edge of the pane, 
    * and respawn ball with game 'paused'
    */
-  private void failConditionResult() {
+  public void failConditionResult() {
     betweenGames = true;
     gameplay.pause();
     lives--;
@@ -309,12 +293,12 @@ public class Blockade extends Pane {
     double startY = 30;
     for (int i = 0; i < gridLength; i++) {
       for (int j = 0; j < gridDepth; j++) {
-        this.getChildren().add(new RandomColorBrick(startX + i * Brick.getBrickWidth(),
+        this.addGameObject(new RandomColorBrick(startX + i * Brick.getBrickWidth(),
           startY + j * Brick.getBrickHeight()));
       }
     }
     // TESTING LLAAVA
-    this.getChildren().add(new LavaBrick(startX + Brick.getBrickWidth(),
+    this.addGameObject(new LavaBrick(startX + Brick.getBrickWidth(),
           startY + gridDepth * Brick.getBrickHeight()));
   }
 
@@ -339,10 +323,11 @@ public class Blockade extends Pane {
     return this.lives;
   }
 
-  public void registerEvent(Event event) {
-    switch (event.getPhase()) {
-      // case Event.GamePhase.BrickCollision -> System.out.println("Register BrickCollision Event");
-      default -> System.out.println("Unhandled event : " + event.toString());
+  public void addGameObject(Shape shape) {
+    if (shape instanceof GameAware gameAware) {
+      gameAware.setGame(this);
     }
+    this.getChildren().add(shape);
   }
+
 }

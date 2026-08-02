@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.theupquark.games.blockade.Blockade;
 import com.theupquark.games.blockade.event.Event;
 import com.theupquark.games.blockade.event.HoldsEvents;
+import com.theupquark.games.common.GameAware;
 
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 
-public class Ball extends Circle implements HoldsEvents {
+public class Ball extends Circle implements HoldsEvents, GameAware {
 
   private double velocityX;
   private double velocityY;
@@ -25,6 +27,7 @@ public class Ball extends Circle implements HoldsEvents {
   private boolean slice = false;
 
   private List<Event> events = new ArrayList<>();
+  private Blockade game;
 
   public Ball(double centerX, double centerY, Random random) {
     super(centerX, centerY, 10, Color.WHITE);
@@ -38,6 +41,14 @@ public class Ball extends Circle implements HoldsEvents {
   @Override
   public List<Event> getEvents() {
     return this.events;
+  }
+
+  public Blockade getGame() {
+    return this.game;
+  }
+
+  public void setGame(Blockade game) {
+    this.game = game;
   }
 
   public void setVelocityX(double velocityX) {
@@ -110,6 +121,63 @@ public class Ball extends Circle implements HoldsEvents {
     this.damage = 1;
     this.setFill(Color.WHITE);
     this.slice = false;
+  }
+
+  public void registerBorderBounceEvents() {
+    Event sideBounce = Event
+      .during(Event.GamePhase.HitBorder)
+      .when(g -> {
+        double width = (g != null && g.getWidth() > 0) ? g.getWidth() : (g != null ? g.getPrefWidth() : 900);
+        return this.getCenterX() < this.getRadius() || this.getCenterX() > width - this.getRadius();
+      })
+      .then(g -> {
+        // TODO Ball sound should probably be created, defined, and called from a Ball method.
+        if (g != null) {
+          g.restartSoundCollision();
+        }
+        this.setVelocityX(-this.getVelocityX());
+      })
+      .times(-1);
+    this.registerEvent(sideBounce);
+
+    Event topBounce = Event
+      .during(Event.GamePhase.HitBorder)
+      .when(g -> {
+        return this.getCenterY() < this.getRadius();
+      })
+      .then(g -> {
+        // TODO Ball sound should probably be created, defined, and called from a Ball method.
+        if (g != null) {
+          g.restartSoundCollision();
+          g.checkWinCondition();
+        }
+        this.setVelocityY(-this.getVelocityY());
+      })
+      .times(-1);
+    this.registerEvent(topBounce);
+
+    Event bottomDeadzone = Event
+      .during(Event.GamePhase.HitBorder)
+      .when(g -> {
+        double height = (g != null && g.getHeight() > 0) ? g.getHeight() : (g != null ? g.getPrefHeight() : 600);
+        return this.getCenterY() > height - this.getRadius();
+      })
+      .then(g -> {
+        if (g != null) {
+          g.restartSoundCollision();
+          g.failConditionResult();
+        }
+      })
+      .times(-1);
+    this.registerEvent(bottomDeadzone);
+  }
+
+  public boolean isAtBorder() {
+    if (getGame() == null) return false;
+    return this.getCenterX() <= this.getRadius()
+        || this.getCenterX() >= getGame().getWidth() - this.getRadius()
+        || this.getCenterY() <= this.getRadius()
+        || this.getCenterY() >= getGame().getHeight() - this.getRadius();
   }
 
 }

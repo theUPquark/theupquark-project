@@ -42,8 +42,9 @@ public class LavaBrick extends Brick {
   }
 
   private Event powerDownBall(Ball instigator) {
-    return Event.in(null)
+    return Event
       .during(Event.GamePhase.HitBorder)
+      .when((game) -> instigator.isAtBorder())
       .then((game) -> {
         instigator.returnToNormal();
         System.out.println("Called LavaBrick Event to power down ball");
